@@ -1,6 +1,6 @@
 # Distributed Load-Balanced Multi-Instance Architecture
 
-[![CI/CD Pipeline](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI/CD Pipeline](https://github.com/Aryan-Goyat/distributed-load-balancer-app/actions/workflows/ci.yml/badge.svg)](https://github.com/Aryan-Goyat/distributed-load-balancer-app/actions/workflows/ci.yml)
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)
 ![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED.svg?logo=docker&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-Load--Balancer-009639.svg?logo=nginx&logoColor=white)
@@ -258,8 +258,8 @@ newgrp docker
 ### Step 5: Deploy the Application
 Clone your repository and start the cluster:
 ```bash
-git clone https://github.com/<YOUR-USERNAME>/<YOUR-REPO-NAME>.git
-cd <YOUR-REPO-NAME>
+git clone https://github.com/Aryan-Goyat/distributed-load-balancer-app.git
+cd distributed-load-balancer-app
 
 # Launch the distributed container cluster in daemon mode
 docker compose up -d --build

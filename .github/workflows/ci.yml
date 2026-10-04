@@ -1,0 +1,73 @@
+name: CI/CD Pipeline - Test & Build Verification
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Run Automated Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements.txt
+
+      - name: Run Pytest Suite (Blocks Push/Merge on Failure)
+        run: |
+          pytest -v tests/
+
+  build-and-verify-containers:
+    name: Build & Verify Docker Cluster
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Configuration
+        run: |
+          docker compose config
+
+      - name: Build Docker Container Images
+        run: |
+          docker compose build
+
+      - name: Launch Distributed Cluster
+        run: |
+          docker compose up -d
+
+      - name: Run Integration Smoke Tests
+        run: |
+          echo "Waiting for services to become healthy..."
+          sleep 6
+          
+          echo "Testing Load Balancer Health Endpoint..."
+          curl --fail --retry 3 --retry-delay 2 http://localhost/lb-health
+          
+          echo "Testing Backend Service via Load Balancer..."
+          curl --fail --retry 3 --retry-delay 2 http://localhost/health
+          
+          echo "Testing Multi-Instance Distribution..."
+          for i in {1..6}; do
+            curl -s http://localhost/ | grep "instance_id"
+          done
+
+      - name: Clean Up Cluster
+        if: always()
+        run: |
+          docker compose down

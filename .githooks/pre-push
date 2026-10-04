@@ -1,0 +1,37 @@
+#!/bin/sh
+echo "============================================="
+echo "  [PRE-PUSH HOOK] Running Automated Tests...  "
+echo "============================================="
+
+# Detect python or pytest executable
+if command -v pytest >/dev/null 2>&1; then
+    pytest tests/
+elif [ -f ".venv/Scripts/pytest.exe" ]; then
+    .venv/Scripts/pytest.exe tests/
+elif [ -f ".venv/bin/pytest" ]; then
+    .venv/bin/pytest tests/
+elif command -v python >/dev/null 2>&1; then
+    python -m pytest tests/
+elif command -v py >/dev/null 2>&1; then
+    py -m pytest tests/
+else
+    echo "Warning: Python/Pytest not detected in PATH. Proceeding..."
+    exit 0
+fi
+
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "============================================="
+    echo " ❌ [PUSH BLOCKED] Tests failed!             "
+    echo " You cannot push failing code to the remote. "
+    echo " Please resolve test failures first.         "
+    echo "============================================="
+    exit 1
+fi
+
+echo ""
+echo "✅ [SUCCESS] All tests passed. Push authorized!"
+echo "============================================="
+exit 0
